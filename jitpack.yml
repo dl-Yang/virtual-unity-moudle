@@ -3,7 +3,6 @@ jdk:
 
 before_install:
   - chmod +x gradlew
-  - export ANDROID_NDK_HOME=$ANDROID_HOME/ndk-bundle
-
+  -
 install:
-  - ./gradlew :tuanjieLibrary:bundleReleaseAar -Pandroid.ndkPath=$ANDROID_HOME/ndk-bundle
+  - ./gradlew :tuanjieLibrary:bundleReleaseAar
