@@ -1,0 +1,11 @@
+# jitpack.yml 配置
+jdk:
+  - openjdk11 # 或者根据你的 Gradle 版本选择 openjdk17
+
+before_install:
+  - chmod +x gradlew
+
+# 核心：指定只构建 unityLibrary
+install:
+  - ./gradlew :tuanjieLibrary:bundleDebugAar
+  - ./gradlew :tuanjieLibrary:bundleReleaseAar

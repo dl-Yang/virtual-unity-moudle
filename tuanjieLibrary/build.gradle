@@ -1,5 +1,23 @@
 apply plugin: 'com.android.library'
 
+// 1. 必须引入 maven-publish 插件
+apply plugin: 'maven-publish'
+
+// 2. 配置发布组件
+afterEvaluate {
+    publishing {
+        publications {
+            // 定义发布任务名（随意起，如 release）
+            release(MavenPublication) {
+                // 这里的 groupId, artifactId 在 JitPack 中会被自动覆盖，但必须写占位符
+//                from components.release
+                groupId = 'com.github.dl-Yang'
+                artifactId = 'virtual-unity-moudle'
+                version = '0.0.1'
+            }
+        }
+    }
+}
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
@@ -26,6 +44,13 @@ android {
         versionCode 1
         versionName '0.1.0'
         consumerProguardFiles 'proguard-tuanjie.txt'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+        }
     }
 
     lintOptions {
@@ -62,13 +87,13 @@ def BuildIl2Cpp(String workingDir, String configuration, String architecture, St
     commandLineArgs.add("--configuration=" + configuration)
     commandLineArgs.add("--dotnetprofile=unityaot-linux")
     commandLineArgs.add("--profiler-report")
-    commandLineArgs.add("--profiler-output-file=" + workingDir + "/build/il2cpp_"+ abi + "_" + configuration + "/il2cpp_conv.traceevents")
+    commandLineArgs.add("--profiler-output-file=" + workingDir + "/build/il2cpp_" + abi + "_" + configuration + "/il2cpp_conv.traceevents")
     commandLineArgs.add("--print-command-line")
     commandLineArgs.add("--data-folder=" + workingDir + "/src/main/Il2CppOutputProject/Source/il2cppOutput/data")
     commandLineArgs.add("--generatedcppdir=" + workingDir + "/src/main/Il2CppOutputProject/Source/il2cppOutput")
-    commandLineArgs.add("--cachedirectory=" + workingDir + "/build/il2cpp_"+ abi + "_" + configuration + "/il2cpp_cache")
+    commandLineArgs.add("--cachedirectory=" + workingDir + "/build/il2cpp_" + abi + "_" + configuration + "/il2cpp_cache")
     commandLineArgs.add("--tool-chain-path=" + android.ndkDirectory)
-    staticLibraries.eachWithIndex {fileName, i->
+    staticLibraries.eachWithIndex { fileName, i ->
         commandLineArgs.add("--additional-libraries=" + workingDir + "/src/main/jniStaticLibs/" + abi + "/" + fileName)
     }
     def executableExtension = ""
@@ -88,7 +113,7 @@ def BuildIl2Cpp(String workingDir, String configuration, String architecture, St
 android {
     task BuildIl2CppTask {
         doLast {
-              BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'arm64', 'arm64-v8a', [  ] as String[]);
+            BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'arm64', 'arm64-v8a', [] as String[]);
         }
     }
     afterEvaluate {
