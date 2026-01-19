@@ -6,6 +6,6 @@ before_install:
   - export ANDROID_SDK_ROOT=/home/jitpack/android-sdk
   - export ANDROID_HOME=/home/jitpack/android-sdk
   - yes | sdkmanager --licenses
-  - sdkmanager "ndk;26.1.10909125"
+  - sdkmanager "ndk;23.1.7779620"
 install:
   - ./gradlew :tuanjieLibrary:bundleReleaseAar

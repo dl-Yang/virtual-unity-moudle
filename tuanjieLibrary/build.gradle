@@ -26,7 +26,12 @@ dependencies {
 
 android {
     namespace "com.unity3d.player"
-    ndkPath "D:/tuanjie/editor/2022.3.62t2/Editor/Data/PlaybackEngines/AndroidPlayer/NDK"
+    def envNdkPath = System.getenv("ANDROID_NDK_HOME") ?: System.getenv("ANDROID_NDK_ROOT")
+    if (envNdkPath && new File(envNdkPath).exists()) {
+        ndkPath envNdkPath
+    } else {
+        ndkVersion "23.1.7779620"
+    }
     compileSdkVersion 35
 //    buildToolsVersion '34.0.0'
 
@@ -35,7 +40,7 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    ndkPath "**NDKPATH**"
+//    ndkPath "**NDKPATH**"
 //    ndkVersion = "26.1.10909125"
 
     defaultConfig {
@@ -84,8 +89,12 @@ def getSdkDir() {
 }
 
 def hasValidNdk() {
-    def ndkDir = android.ndkDirectory
-    return ndkDir != null && ndkDir.exists()
+    try {
+        def ndkDir = android.ndkDirectory
+        return ndkDir != null && ndkDir.exists()
+    } catch (Exception ignored) {
+        return false
+    }
 }
 
 def BuildIl2Cpp(String workingDir, String configuration, String architecture, String abi, String[] staticLibraries) {
