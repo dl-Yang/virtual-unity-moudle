@@ -26,7 +26,7 @@ dependencies {
 
 android {
     namespace "com.unity3d.player"
-//    ndkPath "D:/tuanjie/editor/2022.3.62t2/Editor/Data/PlaybackEngines/AndroidPlayer/NDK"
+    ndkPath "D:/tuanjie/editor/2022.3.62t2/Editor/Data/PlaybackEngines/AndroidPlayer/NDK"
     compileSdkVersion 35
 //    buildToolsVersion '34.0.0'
 
@@ -74,9 +74,18 @@ android {
 }
 
 def getSdkDir() {
-    Properties local = new Properties()
-    local.load(new FileInputStream("${rootDir}/local.properties"))
-    return local.getProperty('sdk.dir')
+    File localFile = new File("${rootDir}/local.properties")
+    if (localFile.exists()) {
+        Properties local = new Properties()
+        local.load(new FileInputStream(localFile))
+        return local.getProperty('sdk.dir')
+    }
+    return System.getenv("ANDROID_SDK_ROOT") ?: System.getenv("ANDROID_HOME")
+}
+
+def hasValidNdk() {
+    def ndkDir = android.ndkDirectory
+    return ndkDir != null && ndkDir.exists()
 }
 
 def BuildIl2Cpp(String workingDir, String configuration, String architecture, String abi, String[] staticLibraries) {
@@ -115,14 +124,21 @@ def BuildIl2Cpp(String workingDir, String configuration, String architecture, St
 
 android {
     task BuildIl2CppTask {
+        onlyIf {
+            def valid = hasValidNdk()
+            if (!valid) {
+                logger.lifecycle("Skipping BuildIl2CppTask because NDK is not available.")
+            }
+            return valid
+        }
         doLast {
             BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'arm64', 'arm64-v8a', [] as String[]);
         }
     }
     afterEvaluate {
-        if (project(':tuanjieLibrary').tasks.findByName('mergeDebugJniLibFolders'))
+        if (hasValidNdk() && project(':tuanjieLibrary').tasks.findByName('mergeDebugJniLibFolders'))
             project(':tuanjieLibrary').mergeDebugJniLibFolders.dependsOn BuildIl2CppTask
-        if (project(':tuanjieLibrary').tasks.findByName('mergeReleaseJniLibFolders'))
+        if (hasValidNdk() && project(':tuanjieLibrary').tasks.findByName('mergeReleaseJniLibFolders'))
             project(':tuanjieLibrary').mergeReleaseJniLibFolders.dependsOn BuildIl2CppTask
     }
     sourceSets {
