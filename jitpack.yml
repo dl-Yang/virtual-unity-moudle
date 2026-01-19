@@ -5,7 +5,8 @@ before_install:
   - chmod +x gradlew
   - export ANDROID_SDK_ROOT=/home/jitpack/android-sdk
   - export ANDROID_HOME=/home/jitpack/android-sdk
+  - export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
   - yes | sdkmanager --licenses
-  - sdkmanager "ndk;23.1.7779620"
+  - sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;23.1.7779620"
 install:
   - ./gradlew :tuanjieLibrary:bundleReleaseAar
