@@ -35,6 +35,8 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    ndkVersion = "26.1.10909125"
+
     defaultConfig {
         minSdkVersion 25
         targetSdkVersion 35
